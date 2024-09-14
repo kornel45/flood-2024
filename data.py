@@ -5,7 +5,6 @@ from datetime import datetime
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from cachetools.func import ttl_cache
 from requests.models import PreparedRequest
 
 from common import logger
@@ -38,12 +37,10 @@ def _get_data(url, tries=3):
     return r.text
 
 
-@ttl_cache(maxsize=128, ttl=15 * 60)
 def get_data(url):
     return _get_data(url)
 
 
-@ttl_cache(maxsize=128, ttl=24 * 60 * 60)  # can be cached, as they are not building any more cities in near future
 def get_cities(url):
     logger.info(f'Getting cities data from {url}...')
     html = get_data(url)

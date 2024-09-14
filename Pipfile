@@ -4,15 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pandas = "*"
-lxml = "*"
-streamlit = "*"
-bs4 = "*"
-watchdog = "*"
-matplotlib = "*"
-altair = "*"
-cachetools = "*"
-schedule = "*"
+pandas = "==2.2.2"
+lxml = "==5.3.0"
+streamlit = "==1.38.0"
+bs4 = "=0.0.2"
+watchdog = "==5.0.2"
+altair = "==5.4.1"
 
 [dev-packages]
 
