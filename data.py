@@ -5,9 +5,9 @@ import requests
 from bs4 import BeautifulSoup
 from requests.models import PreparedRequest
 
-from common import cache_function_result
+from common import cache_function_result, logger
 
-TTL = 15 * 60
+
 
 
 def time_cache(max_age, maxsize=128, typed=False):
@@ -35,21 +35,22 @@ def time_cache(max_age, maxsize=128, typed=False):
 
 def _get_data(url, tries=3):
     r = requests.get(url, allow_redirects=True)
-    time.sleep(0.1)
-    print(f'Getting data for {url}')
+    logger.info(f'Getting data for {url}')
     if r.status_code != 200 and tries > 0:
-        print(f'Retrying to get data from {url}. {r.status_code} : {r.text}')
-        time.sleep(0.5)
+        logger.info(f'Retrying to get data from {url}. {r.status_code} : {r.text}')
+        time.sleep(5)
         return _get_data(url, tries - 1)
     return r.text
 
 
-@cache_function_result(TTL)
+@cache_function_result()
 def get_data(url):
+    time.sleep(10)
     return _get_data(url)
 
 
 def get_cities(url):
+    logger.info(f'Getting cities data from {url}...')
     html = get_data(url)
     soup = BeautifulSoup(html, 'html.parser')
     all_cities = soup.findAll('tr')[1:]
@@ -79,6 +80,7 @@ def get_city_data(city_name, params):
     req.prepare_url(export_url, params)
     r = get_data(req.url)
     with open(f'data/{city_name}.csv', 'w') as f:
+        logger.info(f'writing {len(r)} to {f.name}')
         f.write(r)
 
 

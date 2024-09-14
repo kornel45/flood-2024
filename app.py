@@ -1,9 +1,13 @@
 import os
+import threading
+import time
 
 import altair as alt
 import pandas as pd
+import schedule
 import streamlit as st
 
+from common import logger
 from data import get_cities, get_city_data
 
 
@@ -15,36 +19,56 @@ def load_df(path):
     return df
 
 
-def load_dfs():
+def load_dfs(cities_data):
     result = []
     if not os.path.isdir("data"):
         os.mkdir("data")
+
     files = os.listdir("data")
+    if not files:
+        refresh_data(cities_data)
+        files = os.listdir("data")
     files_order = lambda x: 'aaaa' if 'kłodzko' in x.lower() else x.lower()
     for file in sorted(files, reverse=True, key=files_order):
         title = file.replace('.csv', '')
-        df = load_df(f"data/{file}")
-        result.append([title, df])
+        try:
+            df = load_df(f"data/{file}")
+            result.append([title, df])
+        except:
+            os.remove(f"data/{file}")
     return result
 
 
-if __name__ == '__main__':
-    st.set_page_config(layout="wide")
-    st.write("### Woda w powiecie kłodzkim")
-
-    data_container = st.container()
-    dfs = load_dfs()
-    n, m = 3, 7
-    i = j = 0
-
-    url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
-    city_data = get_cities(url)
-
+def refresh_data(city_data):
     for city in city_data:
+        logger.info(f'refreshing data for {city}')
         # okr is period in hours
         params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
         get_city_data(city, params)
 
+
+def schedule_refresh(city_data):
+    logger.info('running scheduled data refresh')
+    schedule.every(15).minutes.do(refresh_data, city_data=city_data)
+    while True:
+        schedule.run_pending()
+        time.sleep(5)
+
+
+if __name__ == '__main__':
+    url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
+
+    city_data = get_cities(url)
+    t = threading.Thread(target=schedule_refresh, args=(city_data,))
+    t.start()
+
+    st.set_page_config(layout="wide")
+    st.write("### Woda w powiecie kłodzkim")
+
+    data_container = st.container()
+    dfs = load_dfs(city_data)
+    n, m = 3, 7
+    i = j = 0
     with data_container:
         containers = st.columns(n)
         while dfs:
@@ -68,8 +92,8 @@ if __name__ == '__main__':
                     if offset_red < 1:
                         stops = [
                             alt.GradientStop(color='lightblue', offset=0),
-                            alt.GradientStop(color='blue', offset=0.6 * offset_red),
-                            alt.GradientStop(color='darkred', offset=0.7),
+                            alt.GradientStop(color='blue', offset=0.8 * offset_red),
+                            alt.GradientStop(color='darkred', offset=0.9 * offset_red),
                             alt.GradientStop(color='black', offset=1),
                         ]
                     else:
@@ -85,10 +109,7 @@ if __name__ == '__main__':
                             color=alt.Gradient(
                                 gradient='linear',
                                 stops=stops,
-                                x1=1,
-                                x2=1,
-                                y1=1,
-                                y2=0
+                                x1=1, x2=1, y1=1, y2=0
                             )
                         )
                         .encode(

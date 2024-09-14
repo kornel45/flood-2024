@@ -12,6 +12,7 @@ watchdog = "*"
 matplotlib = "*"
 altair = "*"
 cachetools = "*"
+schedule = "*"
 
 [dev-packages]
 
