@@ -4,14 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pandas = "*"
-lxml = "*"
 streamlit = "*"
-bs4 = "*"
-watchdog = "*"
-matplotlib = "*"
-altair = "*"
-cachetools = "*"
 
 [dev-packages]
 
