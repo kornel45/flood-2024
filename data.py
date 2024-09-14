@@ -1,5 +1,8 @@
+import os
 import time
+from datetime import datetime
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from cachetools.func import ttl_cache
@@ -7,20 +10,36 @@ from requests.models import PreparedRequest
 
 from common import logger
 
+CITY_DATA = {
+    'Bardo': {'id': 19, 'max': 774.0}, 'Boboszów': {'id': 10, 'max': 289.0},
+    'Bystrzyca Kł.': {'id': 1, 'max': 360.0}, 'Darnków': {'id': 31, 'max': 897.0},
+    'Duszniki-Zdrój': {'id': 14, 'max': 221.0}, 'Gorzuchów': {'id': 2, 'max': 289.0},
+    'Kłodzko': {'id': 5, 'max': 657.0}, 'Krosnowice': {'id': 6, 'max': 489.0},
+    'Kudowa-Zdrój': {'id': 16, 'max': 378.0}, 'Lądek-Zdrój': {'id': 4, 'max': 311.0},
+    'Międzygórze': {'id': 11, 'max': 2654.0}, 'Międzylesie': {'id': 8, 'max': 339.0},
+    'St. Bystrzyca': {'id': 36, 'max': 187.0}, 'Stronie Śląskie': {'id': 12, 'max': 320.0},
+    'Szalejów Dolny': {'id': 3, 'max': 300.0}, 'Szczytna': {'id': 15, 'max': 396.0},
+    'Ścinawka': {'id': 18, 'max': 450.0}, 'Tłumaczów': {'id': 17, 'max': 360.0},
+    'Wilkanów': {'id': 9, 'max': 360.0}, 'Żelazno': {'id': 7, 'max': 429.0}
+}
+
 
 def _get_data(url, tries=3):
-    r = requests.get(url, allow_redirects=True)
+    headers = {
+        'User-Agent': 'Mozilla/5.0',
+    }
+
+    r = requests.get(url, headers=headers)
     logger.info(f'Getting data for {url}')
     if r.status_code != 200 and tries > 0:
-        logger.info(f'Retrying to get data from {url}. {r.status_code} : {r.text}')
-        time.sleep(5)
+        logger.info(f'[{tries}] Retrying to get data from {url}. {r.status_code} : {r.text}')
+        time.sleep(15)
         return _get_data(url, tries - 1)
     return r.text
 
 
-@ttl_cache(maxsize=128, ttl=5 * 60)
+@ttl_cache(maxsize=128, ttl=15 * 60)
 def get_data(url):
-    time.sleep(5)
     return _get_data(url)
 
 
@@ -50,31 +69,64 @@ def get_cities(url):
     return city_data
 
 
-def get_city_data(city_name, params):
+def download_data_for_city(city_name: str, okr: int = 36):
+    params = {
+        'stc': CITY_DATA[city_name]['id'],
+        'dta': datetime.now().strftime('%Y-%m-%d'),
+        'okr': okr,
+        'typ': 1
+    }
     export_url = 'http://lsop.powiat.klodzko.pl/php/export.php?'
     req = PreparedRequest()
     req.prepare_url(export_url, params)
     r = get_data(req.url)
-    with open(f'data/{city_name}.csv', 'w') as f:
-        logger.info(f'writing {len(r)} to {f.name}')
-        f.write(r)
-
     return r
 
 
-def refresh_data(city_data):
+def get_data_for_city(city_name: str):
+    filename = f'data/{city_name}.csv'
+    df = pd.read_csv(filename, sep=';')
+    return df
+
+
+def save_to_file(data, filename):
+    with open(filename, 'w') as f:
+        f.write(data)
+
+
+def get_delta(filename):
+    if os.path.exists(filename):
+        modified_time = os.path.getmtime(filename)
+        delta = datetime.now() - datetime.fromtimestamp(modified_time)
+        return delta.total_seconds()
+    return float('inf')
+
+
+def refresh_data(city_data, ttl=60 * 60, force=False):
+    cities_to_update = []
     for city in city_data:
-        logger.info(f'refreshing data for {city}')
-        # okr is period in hours
-        params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
-        get_city_data(city, params)
+        filename = f'data/{city}.csv'
+
+        should_download = False
+        message = ''
+        if not os.path.exists(filename) or force:
+            should_download = True
+            message = 'File does not exist or force.'
+        elif os.path.exists(filename) and get_delta(filename) > ttl:
+            should_download = True
+            message = 'Data outdated. Refreshing.'
+
+        if should_download:
+            cities_to_update.append((city, filename, f'Downloading data for {city}. {message}'))
+
+    logger.info(f'{len(cities_to_update)} cities needs update.')
+    for city, filename, message in cities_to_update:
+        logger.info(message)
+        city_data = download_data_for_city(city)
+        save_to_file(city_data, filename)
+        # simple rate limiting
+        time.sleep(30)
 
 
 if __name__ == '__main__':
-    url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
-
-    city_data = get_cities(url)
-    for city in city_data:
-        # okr is period in hours
-        params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
-        get_city_data(city, params)
+    refresh_data(CITY_DATA)
