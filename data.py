@@ -82,8 +82,6 @@ def get_city_data(city_name, params):
         f.write(r)
 
 
-
-
 if __name__ == '__main__':
     url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
 
