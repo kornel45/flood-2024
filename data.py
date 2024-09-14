@@ -108,13 +108,15 @@ def refresh_data(city_data, ttl=DEFAULT_TTL, force=False):
         filename = f'data/{city}.csv'
 
         should_download = False
-        message = ''
+        message = f'{filename} was downloaded {get_delta(filename)} seconds ago'
         if not os.path.exists(filename) or force:
             should_download = True
             message = 'File does not exist or force.'
         elif os.path.exists(filename) and get_delta(filename) > ttl:
             should_download = True
             message = 'Data outdated. Refreshing.'
+        else:
+            logger.info(message)
 
         if should_download:
             cities_to_update.append((city, filename, f'Downloading data for {city}. {message}'))
