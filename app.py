@@ -1,13 +1,13 @@
 import os
-# import threading
+import threading
 import time
 
-# import pandas as pd
+import pandas as pd
 import streamlit as st
 
-# from chart import create_chart
+from chart import create_chart
 from common import logger
-# from data import refresh_data, CITY_DATA
+from data import refresh_data, CITY_DATA
 
 
 def load_df(path):
@@ -60,25 +60,25 @@ def is_scheduled():
 if __name__ == '__main__':
     logger.info('starting app')
     url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
-    # if not is_scheduled():
-    #     t = threading.Thread(target=schedule_refresh, args=(CITY_DATA,))
-    #     t.start()
-    #     schedule()
+    if not is_scheduled():
+        t = threading.Thread(target=schedule_refresh, args=(CITY_DATA,))
+        t.start()
+        schedule()
 
     st.set_page_config(layout="wide")
     st.write("### Woda w powiecie kłodzkim")
 
-    # data_container = st.container()
-    # dfs = load_dfs(CITY_DATA)
-    # n, m = 3, 7
-    # i = j = 0
-    # with data_container:
-    #     containers = st.columns(n)
-    #     while dfs:
-    #         for container in containers:
-    #             if not dfs:
-    #                 break
-    #             title, df = dfs.pop()
-    #             with container:
-    #                 chart = create_chart(df, title)
-    #                 st.altair_chart(chart, use_container_width=True)
+    data_container = st.container()
+    dfs = load_dfs(CITY_DATA)
+    n, m = 3, 7
+    i = j = 0
+    with data_container:
+        containers = st.columns(n)
+        while dfs:
+            for container in containers:
+                if not dfs:
+                    break
+                title, df = dfs.pop()
+                with container:
+                    chart = create_chart(df, title)
+                    st.altair_chart(chart, use_container_width=True)
