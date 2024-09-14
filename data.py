@@ -7,7 +7,7 @@ from requests.models import PreparedRequest
 
 from common import cache_function_result
 
-TTL = 5 * 60
+TTL = 15 * 60
 
 
 def time_cache(max_age, maxsize=128, typed=False):
@@ -79,3 +79,4 @@ if __name__ == '__main__':
         # okr is period in hours
         params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
         get_city_data(city, params)
+        time.sleep(0.1)
