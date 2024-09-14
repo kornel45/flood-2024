@@ -60,10 +60,10 @@ def is_scheduled():
 if __name__ == '__main__':
     logger.info('starting app')
     url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
-    if not is_scheduled():
-        t = threading.Thread(target=schedule_refresh, args=(CITY_DATA,))
-        t.start()
-        schedule()
+    # if not is_scheduled():
+    #     t = threading.Thread(target=schedule_refresh, args=(CITY_DATA,))
+    #     t.start()
+    #     schedule()
 
     st.set_page_config(layout="wide")
     st.write("### Woda w powiecie kłodzkim")
