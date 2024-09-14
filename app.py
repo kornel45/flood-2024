@@ -42,7 +42,7 @@ def schedule_refresh(city_data):
     logger.info('running scheduled data refresh')
     while True:
         refresh_data(city_data)
-        time.sleep(60)
+        time.sleep(5 * 60)
 
 
 def schedule():

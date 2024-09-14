@@ -22,7 +22,7 @@ CITY_DATA = {
     'Ścinawka': {'id': 18, 'max': 450.0}, 'Tłumaczów': {'id': 17, 'max': 360.0},
     'Wilkanów': {'id': 9, 'max': 360.0}, 'Żelazno': {'id': 7, 'max': 429.0}
 }
-DEFAULT_TTL = int(os.getenv('DEFAULT_TTL', 30 * 60))
+
 
 def _get_data(url, tries=3):
     headers = {
@@ -102,7 +102,7 @@ def get_delta(filename):
     return float('inf')
 
 
-def refresh_data(city_data, ttl=DEFAULT_TTL, force=False):
+def refresh_data(city_data, ttl=int(os.getenv('DEFAULT_TTL', 30 * 60)), force=False):
     cities_to_update = []
     for city in city_data:
         filename = f'data/{city}.csv'
