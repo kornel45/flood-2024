@@ -8,7 +8,7 @@ import schedule
 import streamlit as st
 
 from common import logger
-from data import get_cities, get_city_data
+from data import get_cities, refresh_data
 
 
 def load_df(path):
@@ -37,14 +37,6 @@ def load_dfs(cities_data):
         except:
             os.remove(f"data/{file}")
     return result
-
-
-def refresh_data(city_data):
-    for city in city_data:
-        logger.info(f'refreshing data for {city}')
-        # okr is period in hours
-        params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
-        get_city_data(city, params)
 
 
 def schedule_refresh(city_data):

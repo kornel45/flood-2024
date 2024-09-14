@@ -1,36 +1,11 @@
-import functools
 import time
 
 import requests
 from bs4 import BeautifulSoup
+from cachetools.func import ttl_cache
 from requests.models import PreparedRequest
 
-from common import cache_function_result, logger
-
-
-
-
-def time_cache(max_age, maxsize=128, typed=False):
-    """Least-recently-used cache decorator with time-based cache invalidation.
-
-    Args:
-        max_age: Time to live for cached results (in seconds).
-        maxsize: Maximum cache size (see `functools.lru_cache`).
-        typed: Cache on distinct input types (see `functools.lru_cache`).
-    """
-
-    def _decorator(fn):
-        @functools.lru_cache(maxsize=maxsize, typed=typed)
-        def _new(*args, __time_salt, **kwargs):
-            return fn(*args, **kwargs)
-
-        @functools.wraps(fn)
-        def _wrapped(*args, **kwargs):
-            return _new(*args, **kwargs, __time_salt=int(time.time() / max_age))
-
-        return _wrapped
-
-    return _decorator
+from common import logger
 
 
 def _get_data(url, tries=3):
@@ -43,12 +18,13 @@ def _get_data(url, tries=3):
     return r.text
 
 
-@cache_function_result()
+@ttl_cache(maxsize=128, ttl=5 * 60)
 def get_data(url):
-    time.sleep(10)
+    time.sleep(5)
     return _get_data(url)
 
 
+@ttl_cache(maxsize=128, ttl=24 * 60 * 60)  # can be cached, as they are not building any more cities in near future
 def get_cities(url):
     logger.info(f'Getting cities data from {url}...')
     html = get_data(url)
@@ -82,6 +58,16 @@ def get_city_data(city_name, params):
     with open(f'data/{city_name}.csv', 'w') as f:
         logger.info(f'writing {len(r)} to {f.name}')
         f.write(r)
+
+    return r
+
+
+def refresh_data(city_data):
+    for city in city_data:
+        logger.info(f'refreshing data for {city}')
+        # okr is period in hours
+        params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
+        get_city_data(city, params)
 
 
 if __name__ == '__main__':
