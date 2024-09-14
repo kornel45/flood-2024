@@ -1,5 +1,6 @@
 import altair as alt
 import pandas as pd
+from altair import Tooltip
 
 from data import CITY_DATA
 
@@ -41,7 +42,9 @@ def create_chart(df, title):
         .encode(
             x=alt.X('Czas pomiaru', title='Czas pomiaru', axis=alt.Axis(format='%a %H')),
             y=alt.Y('Woda', title='Poziom wody'),
-            tooltip=['Czas pomiaru', "Woda"], y2=alt.value(0)
+            tooltip=[Tooltip('Czas pomiaru', format='%a %H:%MM'),
+                     Tooltip('Woda', title='Poziom wody')],
+            y2=alt.value(0)
         )
 
     )
