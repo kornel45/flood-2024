@@ -62,8 +62,6 @@ if __name__ == '__main__':
                 offset_blue = (df['Woda'].max() / df['max'].max())
                 offset_red = (df['max'].max() / df['Woda'].max())
 
-                print(offset_red, offset_blue)
-
                 with container:
                     title = alt.TitleParams(title, anchor='middle')
 

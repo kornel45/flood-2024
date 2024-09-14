@@ -33,9 +33,20 @@ def time_cache(max_age, maxsize=128, typed=False):
     return _decorator
 
 
+def _get_data(url, tries=3):
+    r = requests.get(url, allow_redirects=True)
+    time.sleep(0.1)
+    print(f'Getting data for {url}')
+    if r.status_code != 200 and tries > 0:
+        print(f'Retrying to get data from {url}. {r.status_code} : {r.text}')
+        time.sleep(0.5)
+        return _get_data(url, tries - 1)
+    return r.text
+
+
 @cache_function_result(TTL)
 def get_data(url):
-    return requests.get(url, allow_redirects=True).text
+    return _get_data(url)
 
 
 def get_cities(url):
@@ -71,6 +82,8 @@ def get_city_data(city_name, params):
         f.write(r)
 
 
+
+
 if __name__ == '__main__':
     url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
 
@@ -79,4 +92,3 @@ if __name__ == '__main__':
         # okr is period in hours
         params = {'stc': city_data[city]['id'], 'dta': '2024-09-14', 'okr': 36, 'typ': 1}
         get_city_data(city, params)
-        time.sleep(0.1)
