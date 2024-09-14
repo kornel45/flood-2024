@@ -5,7 +5,7 @@ import time
 # import pandas as pd
 import streamlit as st
 
-from chart import create_chart
+# from chart import create_chart
 from common import logger
 # from data import refresh_data, CITY_DATA
 
