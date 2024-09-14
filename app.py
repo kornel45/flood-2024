@@ -48,6 +48,7 @@ def schedule_refresh(city_data):
 
 
 if __name__ == '__main__':
+    logger.info('starting app')
     url = 'http://lsop.powiat.klodzko.pl/index.php/woda'
 
     city_data = get_cities(url)
