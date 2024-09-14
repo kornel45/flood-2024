@@ -1,6 +1,6 @@
+import hashlib
 import os
 import time
-import hashlib
 
 
 def cache_function_result(cache_duration=60):
@@ -8,8 +8,9 @@ def cache_function_result(cache_duration=60):
         def wrapper(*args, **kwargs):
             # Generate a unique filename based on the function name and arguments
             cache_key = f"{func.__name__}_{args}_{kwargs}"
+            if not os.path.isdir('cache'):
+                os.mkdir('cache')
             file_name = f"cache/{hashlib.md5(cache_key.encode()).hexdigest()}.cache"
-
             # Check if cache file exists
             if os.path.exists(file_name):
                 with open(file_name, 'r') as f:

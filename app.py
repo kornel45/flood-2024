@@ -17,6 +17,8 @@ def load_df(path):
 
 def load_dfs():
     result = []
+    if not os.path.isdir("data"):
+        os.mkdir("data")
     files = os.listdir("data")
     files_order = lambda x: 'aaaa' if 'kłodzko' in x.lower() else x.lower()
     for file in sorted(files, reverse=True, key=files_order):
@@ -70,4 +72,4 @@ if __name__ == '__main__':
                             + line
                     )
 
-                    st.altair_chart(c, use_container_width = True)
+                    st.altair_chart(c, use_container_width=True)
