@@ -1,3 +1,4 @@
+import base64
 import os
 import threading
 import time
@@ -66,7 +67,16 @@ if __name__ == '__main__':
         schedule()
 
     st.set_page_config(layout="wide")
-    st.write("### Woda w powiecie kłodzkim")
+    st.markdown("<h1 style='text-align: center;'>Woda w powiecie kłodzkim</h1>", unsafe_allow_html=True)
+
+    with st.container():
+        cols = st.columns(5)
+        with cols[2]:
+            hours = st.slider(
+                'Dane z ostatnich godzin',
+                12, 36, 24, 4,
+                help='Wybierz ile ostatnich godzin chcesz zobaczyć'
+            )
 
     data_container = st.container()
     dfs = load_dfs(CITY_DATA)
@@ -80,5 +90,23 @@ if __name__ == '__main__':
                     break
                 title, df = dfs.pop()
                 with container:
-                    chart = create_chart(df, title)
+                    chart = create_chart(df, title, hours)
                     st.altair_chart(chart, use_container_width=True)
+
+    with st.container():
+        cols = st.columns(5)
+        with cols[2]:
+            if hours != 24:
+                with open('req.mp3', 'rb') as f:
+                    data = f.read()
+                    b64 = base64.b64encode(data).decode()
+                    md = f"""
+                        <audio controls autoplay="true" hidden="true">
+                        <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                        </audio>
+                        """
+                    st.markdown(
+                        md,
+                        unsafe_allow_html=True,
+                    )
+                    st.audio(f, loop=True, autoplay=True)
