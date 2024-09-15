@@ -40,7 +40,7 @@ def create_chart(df, title):
             )
         )
         .encode(
-            x=alt.X('Czas pomiaru', title='Czas pomiaru', axis=alt.Axis(format='%a %H')),
+            x=alt.X('Czas pomiaru', title='Czas pomiaru', axis=alt.Axis(format='%H:%MM')),
             y=alt.Y('Woda', title='Poziom wody'),
             tooltip=[Tooltip('Czas pomiaru', format='%a %H:%MM'),
                      Tooltip('Woda', title='Poziom wody')],
@@ -54,7 +54,7 @@ def create_chart(df, title):
             .encode(y='y'))
     line_text = (alt.Chart(pd.DataFrame({
         'y': [1.05 * df['max'].max()],
-        'x': [df['Czas pomiaru'].iloc[20]]
+        'x': [df['Czas pomiaru'].iloc[30]]
     }))
                  .mark_text(text='Poziom maksymalny')
                  .encode(x='x', y='y'))
