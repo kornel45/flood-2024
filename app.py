@@ -98,15 +98,4 @@ if __name__ == '__main__':
         with cols[2]:
             if hours != 24:
                 with open('req.mp3', 'rb') as f:
-                    data = f.read()
-                    b64 = base64.b64encode(data).decode()
-                    md = f"""
-                        <audio controls autoplay="true" hidden="true">
-                        <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-                        </audio>
-                        """
-                    st.markdown(
-                        md,
-                        unsafe_allow_html=True,
-                    )
-                    st.audio(f, loop=True, autoplay=True)
+                    st.audio(f, autoplay=True, loop=True)
