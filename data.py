@@ -99,7 +99,7 @@ def get_delta(filename):
     return float('inf')
 
 
-def refresh_data(city_data, ttl=int(os.getenv('DEFAULT_TTL', 30 * 60)), force=False):
+def refresh_data(city_data, ttl=int(os.getenv('DEFAULT_TTL', 60 * 60)), force=False):
     cities_to_update = []
     for city in city_data:
         filename = f'data/{city}.csv'

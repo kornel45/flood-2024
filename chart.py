@@ -49,9 +49,9 @@ def create_chart(df, title, hours):
             )
         )
         .encode(
-            x=alt.X('Czas pomiaru', title='Czas pomiaru', axis=alt.Axis(format='%H:%MM')),
+            x=alt.X('Czas pomiaru', title='Czas pomiaru', axis=alt.Axis(format='%H:%M')),
             y=alt.Y('Woda', title='Poziom wody'),
-            tooltip=[Tooltip('Czas pomiaru', format='%a %H:%MM'),
+            tooltip=[Tooltip('Czas pomiaru', format='%a %H:%M'),
                      Tooltip('Woda', title='Poziom wody')],
             y2=alt.value(0)
         )
