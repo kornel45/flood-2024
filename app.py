@@ -1,4 +1,3 @@
-import base64
 import os
 import threading
 import time
@@ -72,6 +71,7 @@ if __name__ == '__main__':
     with st.container():
         cols = st.columns(5)
         with cols[2]:
+            st.warning('Dane odświeżane co godzinę', icon="🚨")
             hours = st.slider(
                 'Dane z ostatnich godzin',
                 12, 36, 24, 4,
