@@ -99,7 +99,7 @@ def get_delta(filename):
     return float('inf')
 
 
-def refresh_data(city_data, ttl=int(os.getenv('DEFAULT_TTL', 60 * 60)), force=False):
+def refresh_data(city_data, ttl=int(os.getenv('DEFAULT_TTL', 15 * 60)), force=False):
     cities_to_update = []
     for city in city_data:
         filename = f'data/{city}.csv'
@@ -124,7 +124,7 @@ def refresh_data(city_data, ttl=int(os.getenv('DEFAULT_TTL', 60 * 60)), force=Fa
         city_data = download_data_for_city(city)
         save_to_file(city_data, filename)
         # simple rate limiting
-        time.sleep(30)
+        time.sleep(2)
 
 
 if __name__ == '__main__':

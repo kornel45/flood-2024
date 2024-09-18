@@ -66,6 +66,8 @@ if __name__ == '__main__':
         schedule()
 
     st.set_page_config(layout="wide")
+    st.sidebar.success("Strona główna")
+
     st.markdown("<h1 style='text-align: center;'>Woda w powiecie kłodzkim</h1>", unsafe_allow_html=True)
 
     with st.container():
@@ -92,10 +94,3 @@ if __name__ == '__main__':
                 with container:
                     chart = create_chart(df, title, hours)
                     st.altair_chart(chart, use_container_width=True)
-
-    with st.container():
-        cols = st.columns(5)
-        with cols[2]:
-            if hours != 24:
-                with open('req.mp3', 'rb') as f:
-                    st.audio(f, autoplay=True, loop=True)

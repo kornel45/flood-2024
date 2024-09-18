@@ -10,7 +10,6 @@ pd.options.mode.chained_assignment = None
 
 
 def create_chart(df, title, hours):
-    df = df[df['Czas pomiaru'] >= datetime.now() - timedelta(hours=hours)]
     try:
         df['max'] = CITY_DATA[title]['max']
     except:
@@ -21,7 +20,7 @@ def create_chart(df, title, hours):
 
     title = alt.TitleParams(
         title, anchor='middle',
-        color='#c70029' if (df['max'].max() / df['Woda'].iloc[-1]) < 1 else None,
+        # color='#c70029' if (df['max'].max() / df['Woda'].iloc[-1]) < 1 else None,
         fontSize=20
     )
 
