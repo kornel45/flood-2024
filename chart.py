@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 import altair as alt
 import pandas as pd
 from altair import Tooltip
@@ -9,7 +7,7 @@ from data import CITY_DATA
 pd.options.mode.chained_assignment = None
 
 
-def create_chart(df, title, hours):
+def create_chart(df, title):
     try:
         df['max'] = CITY_DATA[title]['max']
     except:
@@ -20,7 +18,7 @@ def create_chart(df, title, hours):
 
     title = alt.TitleParams(
         title, anchor='middle',
-        # color='#c70029' if (df['max'].max() / df['Woda'].iloc[-1]) < 1 else None,
+        color='#c70029' if (df['max'].max() / df['Woda'].iloc[-1]) < 1 else None,
         fontSize=20
     )
 

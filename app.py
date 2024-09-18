@@ -66,7 +66,6 @@ if __name__ == '__main__':
         schedule()
 
     st.set_page_config(layout="wide")
-    st.sidebar.success("Strona główna")
 
     st.markdown("<h1 style='text-align: center;'>Woda w powiecie kłodzkim</h1>", unsafe_allow_html=True)
 
@@ -74,11 +73,6 @@ if __name__ == '__main__':
         cols = st.columns(5)
         with cols[2]:
             st.warning('Dane odświeżane co godzinę', icon="🚨")
-            hours = st.slider(
-                'Dane z ostatnich godzin',
-                12, 36, 24, 4,
-                help='Wybierz ile ostatnich godzin chcesz zobaczyć'
-            )
 
     data_container = st.container()
     dfs = load_dfs(CITY_DATA)
@@ -92,5 +86,5 @@ if __name__ == '__main__':
                     break
                 title, df = dfs.pop()
                 with container:
-                    chart = create_chart(df, title, hours)
+                    chart = create_chart(df, title)
                     st.altair_chart(chart, use_container_width=True)
